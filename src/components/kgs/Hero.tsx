@@ -64,7 +64,7 @@ export function Hero() {
       <div className="absolute inset-0 -z-10 bg-gradient-to-t from-ink/88 via-ink/28 via-42% to-transparent" />
 
       <div className="container-kgs relative flex flex-1 flex-col justify-end pt-24 md:pt-28 pb-7 md:pb-12">
-        <div className="flex flex-col gap-9 lg:flex-row lg:items-end lg:justify-between lg:gap-16">
+        <div className="flex flex-col items-start gap-6 md:gap-8">
           {/* Left — logo lockup: mark │ divider │ three-line wordmark */}
           <motion.div {...rise(0.2)} className="flex items-center gap-4 md:gap-6">
             {/* Logo mark — CMS-uploaded logo if present, else the built-in

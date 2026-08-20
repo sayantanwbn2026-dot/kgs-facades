@@ -819,6 +819,7 @@ export type Database = {
           headline_line1: string
           headline_line2: string
           id: string
+          logo_url: string
           partners_label: string
           singleton: boolean
           stat1_label: string
@@ -844,6 +845,7 @@ export type Database = {
           headline_line1?: string
           headline_line2?: string
           id?: string
+          logo_url?: string
           partners_label?: string
           singleton?: boolean
           stat1_label?: string
@@ -869,6 +871,7 @@ export type Database = {
           headline_line1?: string
           headline_line2?: string
           id?: string
+          logo_url?: string
           partners_label?: string
           singleton?: boolean
           stat1_label?: string
@@ -1338,6 +1341,30 @@ export type Database = {
           stat3_value?: string | null
           stat4_label?: string | null
           stat4_value?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      site_settings: {
+        Row: {
+          created_at: string | null
+          id: string
+          landing_order: Json
+          singleton: boolean
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          landing_order?: Json
+          singleton?: boolean
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          landing_order?: Json
+          singleton?: boolean
           updated_at?: string | null
         }
         Relationships: []
