@@ -1,15 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "NITRO_PRESET=vercel npm run build",
-  "outputDirectory": ".vercel/output",
   "installCommand": "npm install",
-  "framework": null,
-  "routes": [
-    {
-      "src": "/assets/(.*)",
-      "headers": { "cache-control": "public, max-age=31536000, immutable" }
-    },
-    { "handle": "filesystem" },
-    { "src": "/(.*)", "dest": "/__server" }
-  ]
+  "framework": null
 }
