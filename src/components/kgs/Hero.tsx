@@ -64,7 +64,7 @@ export function Hero() {
       <div className="absolute inset-0 -z-10 bg-gradient-to-t from-ink/88 via-ink/28 via-42% to-transparent" />
 
       <div className="container-kgs relative flex flex-1 flex-col justify-end pt-24 md:pt-28 pb-7 md:pb-12">
-        <div className="flex flex-col items-start gap-6 md:gap-8">
+        <div className="flex flex-col items-start gap-8 md:flex-row md:items-end md:justify-between">
           {/* Left — logo lockup: mark │ divider │ three-line wordmark */}
           <motion.div {...rise(0.2)} className="flex items-center gap-4 md:gap-6">
             {/* Logo mark — CMS-uploaded logo if present, else the built-in
@@ -105,7 +105,7 @@ export function Hero() {
             </h1>
           </motion.div>
 
-          {/* Right — stat rail, sharing the lockup's foot line */}
+          {/* Right — stat rail, aligned to the logo's baseline on desktop */}
           <motion.div ref={statsRef} {...rise(0.5)} className="flex items-start shrink-0">
             {stats.map((s, i) => (
               <div
