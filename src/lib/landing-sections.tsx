@@ -1,3 +1,4 @@
+import type React from "react";
 import { lazy } from "react";
 
 /**
@@ -25,7 +26,7 @@ export type SectionOrderItem = { key: string; visible?: boolean };
 type RegistryEntry = {
   key: SectionKey;
   label: string;
-  component: React.LazyExoticComponent<() => JSX.Element>;
+  component: React.LazyExoticComponent<() => React.JSX.Element>;
   skeletonH?: string;
 };
 
