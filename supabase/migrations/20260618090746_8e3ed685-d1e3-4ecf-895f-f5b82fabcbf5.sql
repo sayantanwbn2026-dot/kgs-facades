@@ -1,0 +1,1 @@
+ALTER TABLE public.hero DROP COLUMN IF EXISTS announcement_text; ALTER TABLE public.hero DROP COLUMN IF EXISTS announcement_link;
