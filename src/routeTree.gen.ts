@@ -9,33 +9,23 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as ProjectsRouteImport } from './routes/projects'
-import { Route as ProcessRouteImport } from './routes/process'
-import { Route as ExpertiseRouteImport } from './routes/expertise'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AdminRouteRouteImport } from './routes/admin/route'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as ClientsIndexRouteImport } from './routes/clients.index'
+import { Route as ExpertiseRouteImport } from './routes/expertise'
+import { Route as ProcessRouteImport } from './routes/process'
+import { Route as ProjectsRouteImport } from './routes/projects'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
-import { Route as ClientsSlugRouteImport } from './routes/clients.$slug'
-import { Route as AdminLoginRouteImport } from './routes/admin/login'
-import { Route as AdminLayoutRouteImport } from './routes/admin/layout'
-import { Route as AdminEnquiriesRouteImport } from './routes/admin/enquiries'
 import { Route as AdminSectionRouteImport } from './routes/admin/$section'
+import { Route as AdminEnquiriesRouteImport } from './routes/admin/enquiries'
+import { Route as AdminLayoutRouteImport } from './routes/admin/layout'
+import { Route as AdminLoginRouteImport } from './routes/admin/login'
+import { Route as ClientsIndexRouteImport } from './routes/clients.index'
+import { Route as ClientsSlugRouteImport } from './routes/clients.$slug'
 
-const ProjectsRoute = ProjectsRouteImport.update({
-  id: '/projects',
-  path: '/projects',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProcessRoute = ProcessRouteImport.update({
-  id: '/process',
-  path: '/process',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ExpertiseRoute = ExpertiseRouteImport.update({
-  id: '/expertise',
-  path: '/expertise',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -48,14 +38,19 @@ const AdminRouteRoute = AdminRouteRouteImport.update({
   path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const ExpertiseRoute = ExpertiseRouteImport.update({
+  id: '/expertise',
+  path: '/expertise',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ClientsIndexRoute = ClientsIndexRouteImport.update({
-  id: '/clients/',
-  path: '/clients/',
+const ProcessRoute = ProcessRouteImport.update({
+  id: '/process',
+  path: '/process',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProjectsRoute = ProjectsRouteImport.update({
+  id: '/projects',
+  path: '/projects',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
@@ -63,19 +58,9 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRouteRoute,
 } as any)
-const ClientsSlugRoute = ClientsSlugRouteImport.update({
-  id: '/clients/$slug',
-  path: '/clients/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminLoginRoute = AdminLoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => AdminRouteRoute,
-} as any)
-const AdminLayoutRoute = AdminLayoutRouteImport.update({
-  id: '/layout',
-  path: '/layout',
+const AdminSectionRoute = AdminSectionRouteImport.update({
+  id: '/$section',
+  path: '/$section',
   getParentRoute: () => AdminRouteRoute,
 } as any)
 const AdminEnquiriesRoute = AdminEnquiriesRouteImport.update({
@@ -83,10 +68,25 @@ const AdminEnquiriesRoute = AdminEnquiriesRouteImport.update({
   path: '/enquiries',
   getParentRoute: () => AdminRouteRoute,
 } as any)
-const AdminSectionRoute = AdminSectionRouteImport.update({
-  id: '/$section',
-  path: '/$section',
+const AdminLayoutRoute = AdminLayoutRouteImport.update({
+  id: '/layout',
+  path: '/layout',
   getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const ClientsIndexRoute = ClientsIndexRouteImport.update({
+  id: '/clients/',
+  path: '/clients/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ClientsSlugRoute = ClientsSlugRouteImport.update({
+  id: '/clients/$slug',
+  path: '/clients/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -194,25 +194,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/projects': {
-      id: '/projects'
-      path: '/projects'
-      fullPath: '/projects'
-      preLoaderRoute: typeof ProjectsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/process': {
-      id: '/process'
-      path: '/process'
-      fullPath: '/process'
-      preLoaderRoute: typeof ProcessRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/expertise': {
-      id: '/expertise'
-      path: '/expertise'
-      fullPath: '/expertise'
-      preLoaderRoute: typeof ExpertiseRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -229,18 +215,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/expertise': {
+      id: '/expertise'
+      path: '/expertise'
+      fullPath: '/expertise'
+      preLoaderRoute: typeof ExpertiseRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/clients/': {
-      id: '/clients/'
-      path: '/clients'
-      fullPath: '/clients/'
-      preLoaderRoute: typeof ClientsIndexRouteImport
+    '/process': {
+      id: '/process'
+      path: '/process'
+      fullPath: '/process'
+      preLoaderRoute: typeof ProcessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/projects': {
+      id: '/projects'
+      path: '/projects'
+      fullPath: '/projects'
+      preLoaderRoute: typeof ProjectsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/': {
@@ -250,25 +243,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRouteRoute
     }
-    '/clients/$slug': {
-      id: '/clients/$slug'
-      path: '/clients/$slug'
-      fullPath: '/clients/$slug'
-      preLoaderRoute: typeof ClientsSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/login': {
-      id: '/admin/login'
-      path: '/login'
-      fullPath: '/admin/login'
-      preLoaderRoute: typeof AdminLoginRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
-    '/admin/layout': {
-      id: '/admin/layout'
-      path: '/layout'
-      fullPath: '/admin/layout'
-      preLoaderRoute: typeof AdminLayoutRouteImport
+    '/admin/$section': {
+      id: '/admin/$section'
+      path: '/$section'
+      fullPath: '/admin/$section'
+      preLoaderRoute: typeof AdminSectionRouteImport
       parentRoute: typeof AdminRouteRoute
     }
     '/admin/enquiries': {
@@ -278,12 +257,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminEnquiriesRouteImport
       parentRoute: typeof AdminRouteRoute
     }
-    '/admin/$section': {
-      id: '/admin/$section'
-      path: '/$section'
-      fullPath: '/admin/$section'
-      preLoaderRoute: typeof AdminSectionRouteImport
+    '/admin/layout': {
+      id: '/admin/layout'
+      path: '/layout'
+      fullPath: '/admin/layout'
+      preLoaderRoute: typeof AdminLayoutRouteImport
       parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/clients/': {
+      id: '/clients/'
+      path: '/clients'
+      fullPath: '/clients/'
+      preLoaderRoute: typeof ClientsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/clients/$slug': {
+      id: '/clients/$slug'
+      path: '/clients/$slug'
+      fullPath: '/clients/$slug'
+      preLoaderRoute: typeof ClientsSlugRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }

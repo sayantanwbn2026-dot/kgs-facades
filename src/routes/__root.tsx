@@ -40,7 +40,10 @@ function NotFoundComponent() {
   );
 }
 
-function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+// TanStack Router types the caught value as `unknown` (anything can be thrown),
+// so normalise it before anything downstream touches `.message`.
+function ErrorComponent({ error: thrown, reset }: { error: unknown; reset: () => void }) {
+  const error = thrown instanceof Error ? thrown : new Error(String(thrown));
   console.error(error);
   const router = useRouter();
   useEffect(() => {

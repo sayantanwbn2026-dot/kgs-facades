@@ -5,7 +5,11 @@ import { AdminEditor } from "@/components/cms/AdminEditor";
 export const Route = createFileRoute("/admin/$section")({
   component: SectionPage,
   notFoundComponent: () => <div className="p-8">Section not found.</div>,
-  errorComponent: ({ error }) => <div className="p-8 text-red-600">Error: {error.message}</div>,
+  errorComponent: ({ error }) => (
+    <div className="p-8 text-red-600">
+      Error: {error instanceof Error ? error.message : String(error)}
+    </div>
+  ),
 });
 
 function SectionPage() {
