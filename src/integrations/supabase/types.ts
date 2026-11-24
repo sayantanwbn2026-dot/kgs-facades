@@ -85,6 +85,7 @@ export type Database = {
           factory_name: string | null
           hero_eyebrow: string | null
           hero_highlight: string | null
+          hero_image_url: string
           hero_subtitle: string | null
           hero_title: string | null
           id: string
@@ -126,6 +127,7 @@ export type Database = {
           factory_name?: string | null
           hero_eyebrow?: string | null
           hero_highlight?: string | null
+          hero_image_url?: string
           hero_subtitle?: string | null
           hero_title?: string | null
           id?: string
@@ -167,6 +169,7 @@ export type Database = {
           factory_name?: string | null
           hero_eyebrow?: string | null
           hero_highlight?: string | null
+          hero_image_url?: string
           hero_subtitle?: string | null
           hero_title?: string | null
           id?: string
@@ -393,6 +396,7 @@ export type Database = {
           cta_title: string | null
           hero_eyebrow: string | null
           hero_highlight: string | null
+          hero_image_url: string
           hero_subtitle: string | null
           hero_title: string | null
           id: string
@@ -412,6 +416,7 @@ export type Database = {
           cta_title?: string | null
           hero_eyebrow?: string | null
           hero_highlight?: string | null
+          hero_image_url?: string
           hero_subtitle?: string | null
           hero_title?: string | null
           id?: string
@@ -431,6 +436,7 @@ export type Database = {
           cta_title?: string | null
           hero_eyebrow?: string | null
           hero_highlight?: string | null
+          hero_image_url?: string
           hero_subtitle?: string | null
           hero_title?: string | null
           id?: string
@@ -488,35 +494,56 @@ export type Database = {
         Row: {
           budget: string
           created_at: string
+          email: string
           id: string
           location: string
           message: string
           name: string
           org: string
+          phone: string
           project: string
           read_at: string | null
         }
         Insert: {
           budget?: string
           created_at?: string
+          email?: string
           id?: string
           location?: string
           message?: string
           name?: string
           org?: string
+          phone?: string
           project?: string
           read_at?: string | null
         }
         Update: {
           budget?: string
           created_at?: string
+          email?: string
           id?: string
           location?: string
           message?: string
           name?: string
           org?: string
+          phone?: string
           project?: string
           read_at?: string | null
+        }
+        Relationships: []
+      }
+      enquiry_throttle: {
+        Row: {
+          created_at: string
+          ip_hash: string
+        }
+        Insert: {
+          created_at?: string
+          ip_hash: string
+        }
+        Update: {
+          created_at?: string
+          ip_hash?: string
         }
         Relationships: []
       }
@@ -648,6 +675,7 @@ export type Database = {
           cta_title: string | null
           hero_eyebrow: string | null
           hero_highlight: string | null
+          hero_image_url: string
           hero_subtitle: string | null
           hero_title: string | null
           id: string
@@ -665,6 +693,7 @@ export type Database = {
           cta_title?: string | null
           hero_eyebrow?: string | null
           hero_highlight?: string | null
+          hero_image_url?: string
           hero_subtitle?: string | null
           hero_title?: string | null
           id?: string
@@ -682,6 +711,7 @@ export type Database = {
           cta_title?: string | null
           hero_eyebrow?: string | null
           hero_highlight?: string | null
+          hero_image_url?: string
           hero_subtitle?: string | null
           hero_title?: string | null
           id?: string
@@ -764,6 +794,8 @@ export type Database = {
           hours_days: string
           hours_time: string
           id: string
+          instagram_url: string
+          linkedin_url: string
           singleton: boolean
           studio_address1: string
           studio_address2: string
@@ -782,6 +814,8 @@ export type Database = {
           hours_days?: string
           hours_time?: string
           id?: string
+          instagram_url?: string
+          linkedin_url?: string
           singleton?: boolean
           studio_address1?: string
           studio_address2?: string
@@ -800,6 +834,8 @@ export type Database = {
           hours_days?: string
           hours_time?: string
           id?: string
+          instagram_url?: string
+          linkedin_url?: string
           singleton?: boolean
           studio_address1?: string
           studio_address2?: string
@@ -1085,6 +1121,7 @@ export type Database = {
           deliverables_heading: string | null
           hero_eyebrow: string | null
           hero_highlight: string | null
+          hero_image_url: string
           hero_subtitle: string | null
           hero_title: string | null
           id: string
@@ -1101,6 +1138,7 @@ export type Database = {
           deliverables_heading?: string | null
           hero_eyebrow?: string | null
           hero_highlight?: string | null
+          hero_image_url?: string
           hero_subtitle?: string | null
           hero_title?: string | null
           id?: string
@@ -1117,6 +1155,7 @@ export type Database = {
           deliverables_heading?: string | null
           hero_eyebrow?: string | null
           hero_highlight?: string | null
+          hero_image_url?: string
           hero_subtitle?: string | null
           hero_title?: string | null
           id?: string
@@ -1287,6 +1326,7 @@ export type Database = {
           cta_title: string | null
           hero_eyebrow: string | null
           hero_highlight: string | null
+          hero_image_url: string
           hero_subtitle: string | null
           hero_title: string | null
           id: string
@@ -1308,6 +1348,7 @@ export type Database = {
           cta_title?: string | null
           hero_eyebrow?: string | null
           hero_highlight?: string | null
+          hero_image_url?: string
           hero_subtitle?: string | null
           hero_title?: string | null
           id?: string
@@ -1329,6 +1370,7 @@ export type Database = {
           cta_title?: string | null
           hero_eyebrow?: string | null
           hero_highlight?: string | null
+          hero_image_url?: string
           hero_subtitle?: string | null
           hero_title?: string | null
           id?: string
@@ -1531,12 +1573,12 @@ export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1560,11 +1602,11 @@ export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1585,11 +1627,11 @@ export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1610,11 +1652,11 @@ export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1627,11 +1669,11 @@ export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
+    : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
