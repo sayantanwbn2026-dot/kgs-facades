@@ -219,7 +219,8 @@ export function Projects() {
               <img
                 src={p.img}
                 alt={p.name}
-                loading="lazy"
+                loading="eager"
+                fetchPriority="low"
                 decoding="async"
                 width={1600}
                 height={1200}
@@ -230,14 +231,14 @@ export function Projects() {
 
               {/* Top meta */}
               <div className="absolute inset-x-0 top-0 p-7 flex justify-between items-start font-display text-[10px] tracking-[0.3em] uppercase text-ink/70 z-10 pointer-events-none">
-                <span className="backdrop-blur bg-background/60 px-3 py-1.5 rounded-full">
+                <span className="bg-background/80 px-3 py-1.5 rounded-full">
                   {p.n}
                 </span>
                 <div className="flex flex-col items-end gap-2">
-                  <span className="backdrop-blur bg-background/60 px-3 py-1.5 rounded-full">
+                  <span className="bg-background/80 px-3 py-1.5 rounded-full">
                     {p.year}
                   </span>
-                  <span className="chip !text-[9px] !py-1 backdrop-blur border-transparent text-ink">
+                  <span className="chip !text-[9px] !py-1 bg-background/80 border-transparent text-ink">
                     {p.tag}
                   </span>
                 </div>
@@ -305,7 +306,7 @@ export function Projects() {
                 className="absolute inset-0 h-full w-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent" />
-              <div className="absolute top-4 right-4 z-10 chip !text-[9px] !py-1 backdrop-blur bg-background/60 border-transparent text-ink">
+              <div className="absolute top-4 right-4 z-10 chip !text-[9px] !py-1 bg-background/80 border-transparent text-ink">
                 {p.tag}
               </div>
               <div className="relative z-10 p-6 pt-16 mt-auto">

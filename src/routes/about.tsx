@@ -20,12 +20,13 @@ const FALLBACK_TIMELINE = [
   { y: "2026", t: "Pan-India engineering",    d: "Engineering hubs supporting national delivery — Kolkata · Mumbai · Bengaluru · NCR." },
 ];
 
-const FALLBACK_LEADERSHIP = [
-  { name: "Rajiv Agarwal",   role: "Managing Director",   bio: "25+ years in facade engineering. Oversees design integrity across the studio's portfolio." },
-  { name: "Aritra Sen",      role: "Head of Engineering", bio: "Structural and BIM lead. Coordinates the technical chain from concept through installation." },
-  { name: "Meher Bhatia",    role: "Head of Fabrication", bio: "Runs the 80,000 sqft factory — CNC, unitised assembly, QA traceability." },
-  { name: "Ishan Kapoor",    role: "Site Operations",     bio: "Leads installation crews and on-site commissioning across India." },
-];
+// Only the founder is shown — the page deliberately carries no team grid.
+const FALLBACK_FOUNDER = {
+  name: "Rathindra Das",
+  role: "Founder & Managing Director",
+  bio: "25+ years in facade engineering. Oversees design integrity across the studio's portfolio.",
+  image_url: "",
+};
 
 const FALLBACK_CERTIFICATIONS = [
   "MSME ZED Silver — Govt. of India",
@@ -50,6 +51,9 @@ export const Route = createFileRoute("/about")({
 function AboutPage() {
   const { ref: statsRef, inView } = useInView({ triggerOnce: true, threshold: 0.3 });
   const { data: page, isLoading: pageLoading } = useSingleton<any>("about_page");
+  // Hero photograph is CMS-editable (Admin → this page → "Hero background
+  // image"); the bundled asset stays as the fallback when none is set.
+  const heroImage = resolveAsset(page?.hero_image_url) || statementImg;
   const { data: tlRows, isLoading: tlLoading } = useList<any>("about_timeline");
   const { data: ldRows, isLoading: ldLoading } = useList<any>("about_leadership");
   const { data: certRows, isLoading: certLoading } = useList<any>("about_certifications");
@@ -59,11 +63,20 @@ function AboutPage() {
     : FALLBACK_TIMELINE;
   if (tlLoading && !TIMELINE.length) TIMELINE.push(...FALLBACK_TIMELINE);
   
-  const LEADERSHIP = ldLoading || (ldRows && ldRows.length)
-    ? (ldRows ?? []).map((r: any) => ({ name: r.name, role: r.role, bio: r.bio, image_url: r.image_url }))
-    : FALLBACK_LEADERSHIP.map((l) => ({ ...l, image_url: "" }));
-  if (ldLoading && !LEADERSHIP.length) LEADERSHIP.push(...FALLBACK_LEADERSHIP.map((l) => ({ ...l, image_url: "" })));
-  
+  // First row only (the list is ordered by sort_order), so extra rows left in
+  // the CMS can never re-introduce a half-empty team grid.
+  const founderRow = (ldRows ?? [])[0];
+  const founder = founderRow
+    ? {
+        name: founderRow.name ?? "",
+        role: founderRow.role ?? "",
+        bio: founderRow.bio ?? "",
+        image_url: founderRow.image_url ?? "",
+      }
+    : ldLoading
+      ? null
+      : FALLBACK_FOUNDER;
+
   const CERTIFICATIONS = certLoading || (certRows && certRows.length)
     ? (certRows ?? []).map((r: any) => r.label)
     : FALLBACK_CERTIFICATIONS;
@@ -119,7 +132,7 @@ function AboutPage() {
     <main className="bg-background text-ink min-h-screen">
       <Nav />
       <PageHero
-        image={statementImg}
+        image={heroImage}
         crumb={crumb}
         eyebrow={heroEyebrow}
         title={heroTitle}
@@ -179,9 +192,18 @@ function AboutPage() {
             { v: stat4Value,    suf: stat4Suffix,      l: stat4Label },
           ].map((s) => (
             <div key={s.l} className="px-6 py-12 text-center">
-              <div className="display-sub text-2xl md:text-[2.1rem] tabular-nums">
-                {inView ? <CountUp end={s.v} duration={1.8} separator="," /> : 0}
-                <span className="text-brass">{s.suf}</span>
+              {/* The invisible copy holds the final value's footprint, so the
+                  counter ticking 0 → 80,000 can't wrap onto a second line
+                  mid-animation and shove the rest of the page down. */}
+              <div className="relative display-sub text-2xl md:text-[2.1rem] tabular-nums">
+                <span aria-hidden className="invisible block">
+                  {Number(s.v).toLocaleString("en-US")}
+                  {s.suf}
+                </span>
+                <span className="absolute inset-0 flex items-center justify-center">
+                  {inView ? <CountUp end={s.v} duration={1.8} separator="," /> : 0}
+                  <span className="text-brass">{s.suf}</span>
+                </span>
               </div>
               <div className="mt-2 font-display text-[10px] tracking-[0.3em] uppercase text-ink-mute">{s.l}</div>
             </div>
@@ -230,48 +252,59 @@ function AboutPage() {
         </div>
       </section>
 
-      {/* Leadership */}
-      <section className="bg-surface py-12 md:py-24">
-        <div className="container-kgs">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 mb-14">
-            <div className="lg:col-span-7">
-              <span className="eyebrow">{leadershipEyebrow}</span>
-              <h2 className="mt-6 display-section text-balance">
-                {leadershipHeading}
-              </h2>
+      {/* Founder — one portrait, image left / copy right. Deliberately not a
+          team grid: a single card in a four-column grid left three columns of
+          bare divider colour sitting next to it. */}
+      {founder && (
+        <section className="bg-surface py-12 md:py-24">
+          <div className="container-kgs">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 mb-10 md:mb-14">
+              <div className="lg:col-span-7">
+                <span className="eyebrow">{leadershipEyebrow}</span>
+                <h2 className="mt-6 display-section text-balance">
+                  {leadershipHeading}
+                </h2>
+              </div>
+              <p className="lg:col-span-5 self-end body-lead max-w-md">
+                {leadershipIntro}
+              </p>
             </div>
-            <p className="lg:col-span-5 self-end body-lead max-w-md">
-              {leadershipIntro}
-            </p>
-          </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-line border border-line">
-            {LEADERSHIP.map((l, i) => (
-              <motion.div
-                key={l.name}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-80px" }}
-                transition={{ duration: 0.7, delay: i * 0.08 }}
-                className="group relative bg-surface p-8 md:p-10 flex flex-col items-center text-center hover:bg-background transition-colors duration-500"
-              >
-                <div className="relative aspect-square w-full shrink-0 rounded-[var(--radius)] bg-gradient-to-br from-surface-2 via-brass-soft to-surface-2 ring-1 ring-line overflow-hidden mb-2">
-                  {l.image_url ? (
-                    <img src={resolveAsset(l.image_url)} alt={l.name} className="absolute inset-0 h-full w-full object-cover bg-surface grayscale-[20%]" />
-                  ) : (
-                    <div className="absolute inset-0 grid place-items-center font-display text-4xl font-semibold text-brass">
-                      {l.name.split(" ").map((n: string) => n[0]).join("")}
-                    </div>
-                  )}
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+              className="grid grid-cols-1 items-center gap-8 border border-line bg-background p-6 md:grid-cols-12 md:gap-12 md:p-10 lg:gap-16 lg:p-12"
+            >
+              <div className="relative aspect-[4/5] overflow-hidden rounded-[var(--radius)] bg-surface-2 ring-1 ring-line md:col-span-5">
+                {founder.image_url ? (
+                  <img
+                    src={resolveAsset(founder.image_url)}
+                    alt={founder.name}
+                    loading="lazy"
+                    decoding="async"
+                    className="absolute inset-0 h-full w-full object-cover grayscale-[20%]"
+                  />
+                ) : (
+                  <div className="absolute inset-0 grid place-items-center bg-gradient-to-br from-surface-2 via-brass-soft to-surface-2 font-display text-5xl font-semibold text-brass">
+                    {founder.name.split(" ").map((n: string) => n[0]).join("")}
+                  </div>
+                )}
+              </div>
+
+              <div className="md:col-span-7">
+                <div className="font-display text-[10px] tracking-[0.3em] uppercase text-brass">
+                  {founder.role}
                 </div>
-                <div className="mt-6 font-display text-[10px] tracking-[0.3em] uppercase text-brass">{l.role}</div>
-                <h3 className="mt-2 display-sub text-xl md:text-2xl">{l.name}</h3>
-                <p className="mt-3 text-[13.5px] text-ink-dim leading-relaxed">{l.bio}</p>
-              </motion.div>
-            ))}
+                <h3 className="mt-3 display-sub text-2xl md:text-[2.1rem]">{founder.name}</h3>
+                <div className="mt-6 h-px w-12 bg-brass" />
+                <p className="mt-6 body-lead max-w-xl">{founder.bio}</p>
+              </div>
+            </motion.div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Factory + Certifications */}
       <section className="bg-background py-12 md:py-24">

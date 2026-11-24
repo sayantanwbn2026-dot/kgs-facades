@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient, type QueryClient } from "@tanstack/react-query";
+import { queryOptions, useQuery, useMutation, useQueryClient, type QueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -23,8 +23,12 @@ export type ListKey = (typeof LISTS)[number];
 export type AnyKey = SingletonKey | ListKey;
 
 /* ------------ Reads ------------ */
-export function useSingleton<T = any>(table: SingletonKey) {
-  return useQuery({
+// Shared with the root route's SSR prefetch (see __root.tsx) — same key/fn so
+// the client hydrates the server-fetched data instead of refetching it, which
+// is what caused the logo/hero to render a fallback before swapping to the
+// CMS value.
+export function singletonQueryOptions<T = any>(table: SingletonKey) {
+  return queryOptions({
     queryKey: ["cms", table],
     queryFn: async (): Promise<T | null> => {
       const { data, error } = await supabase.from(table as any).select("*").limit(1).maybeSingle();
@@ -35,8 +39,12 @@ export function useSingleton<T = any>(table: SingletonKey) {
   });
 }
 
-export function useList<T = any>(table: ListKey) {
-  return useQuery({
+export function useSingleton<T = any>(table: SingletonKey) {
+  return useQuery(singletonQueryOptions<T>(table));
+}
+
+export function listQueryOptions<T = any>(table: ListKey) {
+  return queryOptions({
     queryKey: ["cms", table],
     queryFn: async (): Promise<T[]> => {
       const { data, error } = await supabase
@@ -48,6 +56,10 @@ export function useList<T = any>(table: ListKey) {
     },
     staleTime: 30_000,
   });
+}
+
+export function useList<T = any>(table: ListKey) {
+  return useQuery(listQueryOptions<T>(table));
 }
 
 /* ------------ Mutations ------------ */

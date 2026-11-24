@@ -131,3 +131,25 @@ export function resolveOrderForEditor(
     visible: s.visible,
   }));
 }
+
+/**
+ * Warm every lazy section chunk up front. Each section renders behind a
+ * fixed-height skeleton until its chunk arrives; if that happens mid-scroll
+ * the page height changes under the pinned Projects section and the layout
+ * jumps/overlaps. Resolving them all before the user starts scrolling keeps
+ * the document height stable.
+ */
+export function preloadLandingSections(): Promise<unknown> {
+  return Promise.all([
+    import("@/components/kgs/Partners"),
+    import("@/components/kgs/Features"),
+    import("@/components/kgs/Statement"),
+    import("@/components/kgs/Expertise"),
+    import("@/components/kgs/Projects"),
+    import("@/components/kgs/Process"),
+    import("@/components/kgs/Manufacturing"),
+    import("@/components/kgs/Why"),
+    import("@/components/kgs/Contact"),
+    import("@/components/kgs/Footer"),
+  ]);
+}

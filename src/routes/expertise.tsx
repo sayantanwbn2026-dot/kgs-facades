@@ -108,6 +108,9 @@ export const Route = createFileRoute("/expertise")({
 
 function ExpertisePage() {
   const { data: page, isLoading: pageLoading } = useSingleton<any>("expertise_page");
+  // Hero photograph is CMS-editable (Admin → this page → "Hero background
+  // image"); the bundled asset stays as the fallback when none is set.
+  const heroImage = resolveAsset(page?.hero_image_url) || curtain;
   const { data: items, isLoading: itemsLoading } = useList<any>("expertise_items");
   const { data: compare, isLoading: compareLoading } = useList<any>("expertise_compare");
 
@@ -150,7 +153,7 @@ function ExpertisePage() {
     <main className="bg-background text-ink min-h-screen">
       <Nav />
       <PageHero
-        image={curtain}
+        image={heroImage}
         crumb={crumb}
         eyebrow={heroEyebrow}
         title={heroTitle}

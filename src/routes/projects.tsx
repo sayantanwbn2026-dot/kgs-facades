@@ -57,6 +57,9 @@ export const Route = createFileRoute("/projects")({
 
 function ProjectsPage() {
   const { data: page, isLoading: pageLoading } = useSingleton<any>("projects_page");
+  // Hero photograph is CMS-editable (Admin → this page → "Hero background
+  // image"); the bundled asset stays as the fallback when none is set.
+  const heroImage = resolveAsset(page?.hero_image_url) || aurus;
   const { data: rows, isLoading: rowsLoading } = useList<any>("projects");
   const cms: Project[] = (rows ?? []).map((r: any) => ({
     n: r.number_label ?? "",
@@ -114,7 +117,7 @@ function ProjectsPage() {
     <main className="bg-background text-ink min-h-screen">
       <Nav />
       <PageHero
-        image={aurus}
+        image={heroImage}
         crumb={crumb}
         eyebrow={heroEyebrow}
         title={heroTitle}

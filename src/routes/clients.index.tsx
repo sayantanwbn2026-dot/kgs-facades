@@ -53,6 +53,9 @@ type CProject = {
 
 function ClientsPage() {
   const { data: page, isLoading: pageLoading } = useSingleton<any>("clients_page");
+  // Hero photograph is CMS-editable (Admin → this page → "Hero background
+  // image"); the bundled asset stays as the fallback when none is set.
+  const heroImage = resolveAsset(page?.hero_image_url) || heroImg;
   const { data: clients, isLoading: clientsLoading } = useList<Client>("clients");
   const { data: cProjects, isLoading: cProjectsLoading } = useList<CProject>("client_projects");
 
@@ -88,7 +91,7 @@ function ClientsPage() {
       <Nav />
       <main>
         <PageHero
-          image={heroImg}
+          image={heroImage}
           crumb={crumb}
           eyebrow={heroEyebrow}
           title={heroTitle}

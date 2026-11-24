@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { useRouter, useRouterState, useNavigate } from "@tanstack/react-router";
 import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
 import { ArrowUp, Search, Command } from "lucide-react";
@@ -50,20 +50,25 @@ function ScrollProgress() {
   );
 }
 
-/* 2) Cursor spotlight (desktop only) */
+/* 2) Cursor spotlight (desktop only) — a small gradient disc moved with a
+   compositor-only transform. No React state, no full-viewport repaint. */
 function CursorSpotlight() {
-  const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
-  const [enabled, setEnabled] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (!window.matchMedia("(pointer: fine)").matches) return;
     if (window.matchMedia("(hover: none)").matches) return;
-    setEnabled(true);
+    const el = ref.current;
+    if (!el) return;
     let raf = 0;
-    let next: { x: number; y: number } | null = null;
-    const flush = () => { raf = 0; if (next) setPos(next); };
-    const onMove = (e: MouseEvent) => {
-      next = { x: e.clientX, y: e.clientY };
+    let x = 0, y = 0;
+    const flush = () => {
+      raf = 0;
+      el.style.transform = `translate3d(${x - 280}px, ${y - 280}px, 0)`;
+      el.style.opacity = "1";
+    };
+    const onMove = (e: PointerEvent) => {
+      x = e.clientX; y = e.clientY;
       if (!raf) raf = requestAnimationFrame(flush);
     };
     window.addEventListener("pointermove", onMove, { passive: true });
@@ -72,13 +77,14 @@ function CursorSpotlight() {
       if (raf) cancelAnimationFrame(raf);
     };
   }, []);
-  if (!enabled || !pos) return null;
   return (
     <div
+      ref={ref}
       aria-hidden
-      className="pointer-events-none fixed inset-0 z-[5] mix-blend-soft-light"
+      className="pointer-events-none fixed left-0 top-0 z-[5] h-[560px] w-[560px] opacity-0 will-change-transform"
       style={{
-        background: `radial-gradient(280px circle at ${pos.x}px ${pos.y}px, color-mix(in oklab, var(--brass) 22%, transparent), transparent 70%)`,
+        background:
+          "radial-gradient(circle at center, color-mix(in oklab, var(--brass) 14%, transparent), transparent 70%)",
       }}
     />
   );
@@ -102,7 +108,7 @@ function BackToTop() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 12 }}
           transition={{ duration: 0.25 }}
-          className="fixed bottom-6 right-6 z-[90] grid h-11 w-11 place-items-center rounded-full border border-line bg-surface/90 backdrop-blur shadow-lg hover:bg-brass hover:text-white transition"
+          className="fixed bottom-6 right-6 z-[90] grid h-11 w-11 place-items-center rounded-full border border-line bg-surface/95 shadow-lg hover:bg-brass hover:text-white transition"
         >
           <ArrowUp className="h-4 w-4" />
         </motion.button>
@@ -164,7 +170,7 @@ function CommandPalette() {
       <button
         onClick={() => setOpen(true)}
         aria-label="Open command palette"
-        className="hidden md:inline-flex fixed bottom-6 left-6 z-[90] items-center gap-2 rounded-full border border-line bg-surface/90 backdrop-blur px-3 py-2 text-[11px] font-mono text-ink-dim hover:text-brass hover:border-brass transition shadow-lg"
+        className="hidden md:inline-flex fixed bottom-6 left-6 z-[90] items-center gap-2 rounded-full border border-line bg-surface/95 px-3 py-2 text-[11px] font-mono text-ink-dim hover:text-brass hover:border-brass transition shadow-lg"
       >
         <Command className="h-3 w-3" /> K
       </button>

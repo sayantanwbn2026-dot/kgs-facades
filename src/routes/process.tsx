@@ -9,6 +9,7 @@ import { PageHero } from "@/components/kgs/PageHero";
 import heroImg from "@/assets/manufacturing.jpg";
 import { PageCTA } from "@/components/kgs/PageCTA";
 import { useSingleton, useList } from "@/lib/cms";
+import { resolveAsset } from "@/lib/asset-map";
 
 const FALLBACK_STEPS = [
   {
@@ -64,6 +65,9 @@ export const Route = createFileRoute("/process")({
 
 function ProcessPage() {
   const { data: page, isLoading: pageLoading } = useSingleton<any>("process_page");
+  // Hero photograph is CMS-editable (Admin → this page → "Hero background
+  // image"); the bundled asset stays as the fallback when none is set.
+  const heroImage = resolveAsset(page?.hero_image_url) || heroImg;
   const { data: stepRows, isLoading: stepsLoading } = useList<any>("process_steps");
   const { data: principleRows, isLoading: principlesLoading } = useList<any>("process_principles");
 
@@ -97,7 +101,7 @@ function ProcessPage() {
     <main className="bg-background text-ink min-h-screen">
       <Nav />
       <PageHero
-        image={heroImg}
+        image={heroImage}
         crumb={crumb}
         eyebrow={heroEyebrow}
         title={heroTitle}

@@ -133,7 +133,7 @@ function FeatureCard({
           "radial-gradient(360px circle at var(--mx,50%) var(--my,50%), color-mix(in oklab, var(--brass) 8%, transparent), transparent 60%)",
       }}
     >
-      <div className="absolute top-4 left-4 z-10 chip !text-[10.5px] !py-1 !pl-1.5 !pr-2 bg-background/80 backdrop-blur border border-line text-ink-mute">
+      <div className="absolute top-4 left-4 z-10 chip !text-[10.5px] !py-1 !pl-1.5 !pr-2 bg-background/80 border border-line text-ink-mute">
         <span className="chip-dot !bg-brass" />
         <span className="font-mono">{tag}</span>
       </div>
@@ -239,7 +239,7 @@ function WindSim() {
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg bg-background/85 backdrop-blur border border-line px-2.5 py-1.5">
+    <div className="rounded-lg bg-background/85 border border-line px-2.5 py-1.5">
       <div className="font-mono text-[9.5px] text-ink-mute uppercase tracking-wide">{label}</div>
       <div className="font-display text-[13px] font-semibold text-ink">{value}</div>
     </div>

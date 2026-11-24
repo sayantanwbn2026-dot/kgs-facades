@@ -34,9 +34,9 @@ export function Nav({ alwaysSolid = false }: { alwaysSolid?: boolean } = {}) {
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
       className={[
-        "fixed inset-x-0 top-0 z-[60] transition-all duration-300",
+        "fixed inset-x-0 top-0 z-[60] transition-[background-color,border-color,padding] duration-300",
         solid
-          ? "bg-background/95 backdrop-blur-xl border-b border-line/70 pt-0"
+          ? "bg-background/95 border-b border-line/70 pt-0"
           : // A touch of air above the bar over the hero photo — enough to feel
             // unclamped, not so much that it floats away from the top edge.
             "bg-transparent border-b border-transparent pt-1.5 md:pt-2.5",
@@ -147,7 +147,7 @@ export function Nav({ alwaysSolid = false }: { alwaysSolid?: boolean } = {}) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.25 }}
-            className="lg:hidden absolute top-full mt-2 left-4 right-4 z-[55] rounded-2xl bg-background/95 backdrop-blur-xl border border-line p-4 shadow-2xl"
+            className="lg:hidden absolute top-full mt-2 left-4 right-4 z-[55] rounded-2xl bg-background/95 border border-line p-4 shadow-2xl"
           >
             <div className="flex flex-col gap-1">
               {links.map((l) => (

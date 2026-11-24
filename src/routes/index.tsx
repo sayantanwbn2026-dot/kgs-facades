@@ -1,11 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { SmoothScroll } from "@/components/kgs/SmoothScroll";
 import { Nav } from "@/components/kgs/Nav";
 import { Hero } from "@/components/kgs/Hero";
-import { resolveLandingOrder } from "@/lib/landing-sections";
+import { resolveLandingOrder, preloadLandingSections } from "@/lib/landing-sections";
 
 // Footer is structural (always last); the middle sections come from the
 // registry and render in the CMS-defined order.
@@ -58,6 +58,10 @@ function Index() {
     retry: false,
   });
   const sections = resolveLandingOrder((settings as any)?.landing_order).filter((s) => s.visible);
+
+  useEffect(() => {
+    void preloadLandingSections();
+  }, []);
 
   return (
     <main className="bg-background text-ink min-h-screen">

@@ -62,7 +62,17 @@ export function Contact() {
         message: data.message.slice(0, 5000),
       });
       setSubmitting(false);
-      if (insertError) { toast.error("Couldn't send — please try again."); return; }
+      if (insertError) {
+        // 23514 is the rate limiter — "try again" alone would be misleading,
+        // since an immediate retry is exactly what gets rejected.
+        const throttled = insertError.code === "23514";
+        toast.error(
+          throttled
+            ? "You've sent a few enquiries already. Please wait a few minutes, or email us directly at support@kolkataglazing.com."
+            : "Couldn't send — please try again.",
+        );
+        return;
+      }
       setSubmitted(true);
       // Email delivery to support@kolkataglazing.com is handled by a Postgres
       // trigger on the `enquiries` table (server-side), so nothing to do here.

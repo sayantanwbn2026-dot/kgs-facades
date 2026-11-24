@@ -1,5 +1,7 @@
 import { useEffect } from "react";
 import Lenis from "lenis";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 export function SmoothScroll() {
   useEffect(() => {
@@ -8,17 +10,44 @@ export function SmoothScroll() {
     const isTouch = window.matchMedia("(hover: none), (pointer: coarse)").matches;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (isTouch || reduced) return;
+
+    gsap.registerPlugin(ScrollTrigger);
+
     const lenis = new Lenis({
       duration: 1.25,
       easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
     });
-    let raf = 0;
-    const tick = (time: number) => {
-      lenis.raf(time);
-      raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
+
+    // The Projects section pins itself with GSAP ScrollTrigger, which by
+    // default reads the native window scroll position on its own rAF loop.
+    // Lenis intercepts wheel input and tweens the *visual* scroll separately,
+    // so the two were running un-synced — ScrollTrigger recalculating against
+    // a scroll position Lenis hadn't actually reached yet on every frame,
+    // which is what read as scroll lag/stutter. Driving Lenis off gsap's
+    // ticker (instead of a second, independent rAF loop) and feeding every
+    // Lenis tick into ScrollTrigger.update puts both on one clock.
+    const onLenisScroll = () => ScrollTrigger.update();
+    lenis.on("scroll", onLenisScroll);
+
+    const gsapTick = (time: number) => lenis.raf(time * 1000);
+    gsap.ticker.add(gsapTick);
+    gsap.ticker.lagSmoothing(0);
+
+    // Lazy sections and images change the document height after mount. Re-measure
+    // Lenis and every ScrollTrigger (the Projects pin) whenever that happens,
+    // debounced, so pinned/stacked sections never work from stale offsets.
+    let refreshTimer = 0;
+    const ro = new ResizeObserver(() => {
+      window.clearTimeout(refreshTimer);
+      refreshTimer = window.setTimeout(() => {
+        lenis.resize();
+        ScrollTrigger.refresh();
+      }, 150);
+    });
+    ro.observe(document.body);
+    const onLoad = () => ScrollTrigger.refresh();
+    window.addEventListener("load", onLoad);
 
     const onClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
@@ -32,7 +61,11 @@ export function SmoothScroll() {
 
     return () => {
       document.removeEventListener("click", onClick);
-      cancelAnimationFrame(raf);
+      window.clearTimeout(refreshTimer);
+      ro.disconnect();
+      window.removeEventListener("load", onLoad);
+      gsap.ticker.remove(gsapTick);
+      lenis.off("scroll", onLenisScroll);
       lenis.destroy();
     };
   }, []);

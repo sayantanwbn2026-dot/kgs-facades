@@ -6,7 +6,11 @@ import { resolveAsset } from "@/lib/asset-map";
 export function Preloader() {
   const [done, setDone] = useState(false);
   // Same logo the hero uses (Admin → Hero → "Logo mark"), so both stay in sync.
-  const { data: h, isLoading: logoLoading } = useSingleton<any>("hero");
+  // Not gated on isLoading: waiting on the CMS round-trip left the slot blank
+  // for however long the query took, reading as a slow-loading logo. The
+  // monogram fallback now shows immediately and swaps in the CMS logo the
+  // instant it arrives, same pattern the hero background already uses.
+  const { data: h } = useSingleton<any>("hero");
   const logoUrl = resolveAsset(h?.logo_url);
 
   // Rendered from the very first paint (server included) — gating this behind a
@@ -49,7 +53,7 @@ export function Preloader() {
               {/* Square slot reserves the space so the lockup doesn't shift
                   when the CMS logo finishes loading. */}
               <div className="flex h-[68px] w-[68px] shrink-0 items-center justify-center md:h-[92px] md:w-[92px]">
-                {logoLoading ? null : logoUrl ? (
+                {logoUrl ? (
                   <img
                     src={logoUrl}
                     alt="Kolkata Glazing Services"

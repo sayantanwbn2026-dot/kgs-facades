@@ -9,8 +9,32 @@ import { resolveAsset } from "@/lib/asset-map";
 import { safeUrl } from "@/lib/utils";
 import { ArrowLeft, ArrowUpRight, Award, Building2, Calendar, MapPin, Quote } from "lucide-react";
 
+/** Shared by the route loader and the component, so the page renders from the
+ *  server-fetched record instead of refetching and flashing "Loading client…". */
+async function fetchClientDetail(slug: string) {
+  const { data: client, error } = await supabase
+    .from("clients").select("*").eq("slug", slug).maybeSingle();
+  if (error) throw error;
+  if (!client) return { client: null as Client | null, projects: [] as CProject[] };
+  const { data: projects } = await supabase
+    .from("client_projects").select("*")
+    .eq("client_id", (client as any).id)
+    .order("sort_order", { ascending: true });
+  return { client: client as Client, projects: (projects ?? []) as CProject[] };
+}
+
 export const Route = createFileRoute("/clients/$slug")({
   component: ClientDetail,
+  // Loaded up front purely so <title>/og:title can carry the client's real
+  // name — `head` only sees params, and the slug ("ps-group") was leaking into
+  // search results and link previews.
+  loader: async ({ params }) => {
+    try {
+      return await fetchClientDetail(params.slug);
+    } catch {
+      return { client: null as Client | null, projects: [] as CProject[] };
+    }
+  },
   notFoundComponent: () => (
     <div className="min-h-screen bg-background text-ink">
       <Nav alwaysSolid />
@@ -29,13 +53,16 @@ export const Route = createFileRoute("/clients/$slug")({
       <p>Something went wrong. Please try again.</p>
     </div>
   ),
-  head: ({ params }) => ({
-    meta: [
-      { title: `${params.slug} — Client | KGS Facades` },
-      { name: "description", content: `Projects, scope and engineered value delivered by KGS for ${params.slug}.` },
-      { property: "og:title", content: `${params.slug} — Client | KGS Facades` },
-    ],
-  }),
+  head: ({ loaderData, params }) => {
+    const name = loaderData?.client?.name || params.slug;
+    return {
+      meta: [
+        { title: `${name} — Client | KGS Facades` },
+        { name: "description", content: `Projects, scope and engineered value delivered by KGS for ${name}.` },
+        { property: "og:title", content: `${name} — Client | KGS Facades` },
+      ],
+    };
+  },
 });
 
 type Client = {
@@ -60,19 +87,14 @@ type CProject = {
 function ClientDetail() {
   const { slug } = Route.useParams();
 
+  const loaded = Route.useLoaderData();
   const { data, isLoading } = useQuery({
     queryKey: ["client-detail", slug],
-    queryFn: async () => {
-      const { data: client, error } = await supabase
-        .from("clients").select("*").eq("slug", slug).maybeSingle();
-      if (error) throw error;
-      if (!client) return { client: null, projects: [] as CProject[] };
-      const { data: projects } = await supabase
-        .from("client_projects").select("*")
-        .eq("client_id", (client as any).id)
-        .order("sort_order", { ascending: true });
-      return { client: client as Client, projects: (projects ?? []) as CProject[] };
-    },
+    queryFn: () => fetchClientDetail(slug),
+    // The loader already fetched this on the server; seeding it here keeps the
+    // first paint complete rather than showing a loading line.
+    initialData: loaded,
+    staleTime: 30_000,
   });
 
   if (isLoading) {

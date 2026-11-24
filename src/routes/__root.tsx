@@ -1,4 +1,4 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { dehydrate, HydrationBoundary, QueryClient, QueryClientProvider, type DehydratedState } from "@tanstack/react-query";
 import {
   Outlet,
   Link,
@@ -13,6 +13,10 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { PremiumLayer } from "../components/kgs/PremiumLayer";
 import { Preloader } from "../components/kgs/Preloader";
+import { singletonQueryOptions, listQueryOptions, type SingletonKey, type ListKey } from "../lib/cms";
+
+const HOME_SINGLETONS: SingletonKey[] = ["hero","site_settings","features_intro","statement","expertise_intro","projects_intro","process_intro","manufacturing","why_intro","contact","footer"];
+const HOME_LISTS: ListKey[] = ["partners","features","expertise_items","projects","process_steps","why_cards"];
 
 function NotFoundComponent() {
   return (
@@ -75,6 +79,24 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+  // Prefetched on the server so the Preloader/Hero logo is already in the
+  // first-paint HTML instead of rendering a fallback and swapping to the CMS
+  // value once the client-side fetch resolves.
+  loader: async ({ context, location }) => {
+    const qc = context.queryClient;
+    // Homepage sections otherwise render placeholder copy and swap to the CMS
+    // values as each query lands, which shifts the layout mid-scroll. Fetch it
+    // all in parallel up front; the timeout keeps a slow backend from stalling
+    // the page (unresolved queries just fall back to client fetching).
+    const jobs = location.pathname === "/"
+      ? [...HOME_SINGLETONS.map((t) => singletonQueryOptions(t)), ...HOME_LISTS.map((t) => listQueryOptions(t))]
+      : [singletonQueryOptions("hero")];
+    await Promise.race([
+      Promise.all(jobs.map((o) => qc.prefetchQuery(o as any))),
+      new Promise((r) => setTimeout(r, 3000)),
+    ]);
+    return { dehydratedState: dehydrate(qc) };
+  },
   head: () => ({
     meta: [
       { charSet: "utf-8" },
@@ -126,6 +148,7 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const { dehydratedState } = Route.useLoaderData() as { dehydratedState: DehydratedState };
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -140,10 +163,12 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Preloader />
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
-      <PremiumLayer />
+      <HydrationBoundary state={dehydratedState}>
+        <Preloader />
+        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+        <Outlet />
+        <PremiumLayer />
+      </HydrationBoundary>
     </QueryClientProvider>
   );
 }
